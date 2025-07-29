@@ -12,27 +12,43 @@
  *     DietRequestApproval:
  *       type: object
  *       properties:
- *         id:
+ *         DRA_id:
+ *           type: integer
+ *           format: int64
+ *         DRA_doctor_notes:
  *           type: string
- *         requestId:
+ *         DRA_status:
  *           type: string
- *         approvedBy:
+ *           enum: [pending, approved, rejected]
+ *         DRA_approval:
+ *           type: boolean
+ *         DRA_added_by:
  *           type: string
- *         approvalStatus:
+ *         DRA_added_on:
  *           type: string
- *         approvalDate:
+ *           format: date-time
+ *         DRA_provider_fk:
+ *           type: integer
+ *           format: int64
+ *         DRA_outlet_fk:
  *           type: string
- *         notes:
+ *         DRA_approved_by:
+ *           type: string
+ *         DRA_rejected_by:
  *           type: string
  *       example:
- *         id: "1"
- *         requestId: "1753330110417"
- *         approvedBy: "admin"
- *         approvalStatus: "approved"
- *         approvalDate: "2025-07-24T10:00:00.000Z"
- *         notes: "Approved for special diet."
+ *         DRA_id: 1
+ *         DRA_doctor_notes: "Patient needs low-sodium diet"
+ *         DRA_status: "approved"
+ *         DRA_approval: true
+ *         DRA_added_by: "Dr. Smith"
+ *         DRA_added_on: "2025-07-28T10:30:00Z"
+ *         DRA_provider_fk: 1
+ *         DRA_outlet_fk: "OUTLET001"
+ *         DRA_approved_by: "Dr. Smith"
+ *         DRA_rejected_by: null
  *
- * /Diet Request approval:
+ * /dietRequestApproval:
  *   get:
  *     summary: Get all diet request approvals
  *     tags: [DietRequestApproval]
@@ -62,7 +78,7 @@
  *             schema:
  *               $ref: '#/components/schemas/DietRequestApproval'
  *
- * /Diet Request approval/{id}:
+ * /dietRequestApproval/{id}:
  *   get:
  *     summary: Get a diet request approval by ID
  *     tags: [DietRequestApproval]
@@ -71,7 +87,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *           format: int64
  *     responses:
  *       200:
  *         description: Diet request approval found
@@ -87,7 +104,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *           format: int64
  *     requestBody:
  *       required: true
  *       content:
@@ -109,19 +127,141 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *           format: int64
  *     responses:
  *       200:
  *         description: Diet request approval deleted
+ *
+ * /dietRequestApproval/status/{status}:
+ *   get:
+ *     summary: Get diet request approvals by status
+ *     tags: [DietRequestApproval]
+ *     parameters:
+ *       - in: path
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [pending, approved, rejected]
+ *     responses:
+ *       200:
+ *         description: List of diet request approvals by status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/DietRequestApproval'
+ *
+ * /dietRequestApproval/approval/{approval}:
+ *   get:
+ *     summary: Get diet request approvals by approval status
+ *     tags: [DietRequestApproval]
+ *     parameters:
+ *       - in: path
+ *         name: approval
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *     responses:
+ *       200:
+ *         description: List of diet request approvals by approval status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/DietRequestApproval'
+ *
+ * /dietRequestApproval/{id}/approve:
+ *   post:
+ *     summary: Approve a diet request
+ *     tags: [DietRequestApproval]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           format: int64
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               approvedBy:
+ *                 type: string
+ *               doctorNotes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Diet request approved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DietRequestApproval'
+ *
+ * /dietRequestApproval/{id}/reject:
+ *   post:
+ *     summary: Reject a diet request
+ *     tags: [DietRequestApproval]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           format: int64
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rejectedBy:
+ *                 type: string
+ *               doctorNotes:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Diet request rejected
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DietRequestApproval'
  */
-const express = require('express');
+
+import express from 'express';
+import {
+  getAll,
+  getById,
+  create,
+  update,
+  deleteApproval,
+  getByStatus,
+  getByApproval,
+  approve,
+  reject
+} from '../controllers/dietRequestApprovalController.js';
+
 const router = express.Router();
-const controller = require('../controllers/dietRequestApprovalController');
 
-router.get('/', controller.getAll);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.patch('/:id', controller.update);
-router.delete('/:id', controller.delete);
+// Basic CRUD routes
+router.get('/', getAll);
+router.get('/:id', getById);
+router.post('/', create);
+router.patch('/:id', update);
+router.delete('/:id', deleteApproval);
 
-module.exports = router; 
+// Specialized routes
+router.get('/status/:status', getByStatus);
+router.get('/approval/:approval', getByApproval);
+router.post('/:id/approve', approve);
+router.post('/:id/reject', reject);
+
+export default router;

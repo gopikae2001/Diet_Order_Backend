@@ -160,14 +160,15 @@
  *       200:
  *         description: Diet order deleted
  */
-const express = require('express');
+import express from 'express';
+import { getAll, getById, create, update, deleteOrder } from '../controllers/dietOrdersController.js';
+
 const router = express.Router();
-const controller = require('../controllers/dietOrdersController');
 
-router.get('/', controller.getAll);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.patch('/:id', controller.update);
-router.delete('/:id', controller.delete);
+router.get('/', getAll);
+router.get('/:id', getById);
+router.post('/', create);
+router.patch('/:id', update);
+router.delete('/:id', deleteOrder);
 
-module.exports = router; 
+export default router;

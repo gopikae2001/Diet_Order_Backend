@@ -134,14 +134,15 @@
  *       200:
  *         description: Diet package deleted
  */
-const express = require('express');
+import express from 'express';
+import { getAll, getById, create, update, deletePackage } from '../controllers/dietPackagesController.js';
+
 const router = express.Router();
-const controller = require('../controllers/dietPackagesController');
 
-router.get('/', controller.getAll);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.patch('/:id', controller.update);
-router.delete('/:id', controller.delete);
+router.get('/', getAll);
+router.get('/:id', getById);
+router.post('/', create);
+router.patch('/:id', update);
+router.delete('/:id', deletePackage);
 
-module.exports = router; 
+export default router; 

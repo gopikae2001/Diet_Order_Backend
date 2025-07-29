@@ -17,4 +17,4 @@ const DietRequestSchema = {
   patientType: String,
 };
 
-module.exports = DietRequestSchema; 
+export default DietRequestSchema; 

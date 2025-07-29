@@ -9,14 +9,14 @@ app.use(express.json());
 
 app.use(cors({
   origin: 'http://192.168.50.90:3066',  // React app origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,  // optional, only if you send cookies/auth
 }));
 
 // Import routes
 app.use('/dietOrders', (await import('./routes/dietOrders.js')).default);
-app.use('/dietPackages', (await import('./routes/dietPackages.js')).default);
+// app.use('/dietPackages', (await import('./routes/dietPackages.js')).default);
 app.use('/dietRequests', (await import('./routes/dietRequests.js')).default);
 app.use('/foodItems', (await import('./routes/foodItems.js')).default);
 app.use('/canteenOrders', (await import('./routes/canteenOrders.js')).default);

@@ -105,14 +105,15 @@
  *       200:
  *         description: Custom plan deleted
  */
-const express = require('express');
+import express from 'express';
+import { getAll, getById, create, update, deletePlan } from '../controllers/customPlansController.js';
+
 const router = express.Router();
-const controller = require('../controllers/customPlansController');
 
-router.get('/', controller.getAll);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.patch('/:id', controller.update);
-router.delete('/:id', controller.delete);
+router.get('/', getAll);
+router.get('/:id', getById);
+router.post('/', create);
+router.patch('/:id', update);
+router.delete('/:id', deletePlan);
 
-module.exports = router; 
+export default router; 
