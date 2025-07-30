@@ -205,9 +205,66 @@ async function createFoodItemTable() {
     console.error("❌ Failed to create DM_foodItem table:", err.message);
   }
 }
+
+async function createDietOrderTable() {
+  try {
+    const pool = await sql.connect(config);
+    console.log("Connected to:", process.env.MSSQL_DATABASE);
+    const query = `
+      IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'DM_DietOrder')
+      BEGIN
+        CREATE TABLE DM_DietOrder (
+          DO_ID_PK              BIGINT IDENTITY(1,1) PRIMARY KEY,
+          DO_patientName        VARCHAR(255) NOT NULL,
+          DO_patientId          VARCHAR(100),
+          DO_contactNumber      VARCHAR(20),
+          DO_age                VARCHAR(10),
+          DO_bed                VARCHAR(50),
+          DO_ward               VARCHAR(100),
+          DO_floor              VARCHAR(50),
+          DO_doctor             VARCHAR(255),
+          DO_dietPackage        VARCHAR(255),
+          DO_packageRate        DECIMAL(18,2),
+          DO_startDate          DATE,
+          DO_endDate            DATE,
+          DO_doctorNotes        NVARCHAR(MAX),
+          DO_status             VARCHAR(50) DEFAULT 'pending',
+          DO_approvalStatus     VARCHAR(50) DEFAULT 'pending',
+          DO_dieticianInstructions NVARCHAR(MAX),
+          DO_gender             VARCHAR(10),
+          DO_patientType        VARCHAR(50),
+          DO_email              VARCHAR(255),
+          DO_address            NVARCHAR(MAX),
+          DO_bloodGroup         VARCHAR(10),
+          DO_tokenNo            VARCHAR(50),
+          DO_visitId            VARCHAR(100),
+          DO_added_by           VARCHAR(100),
+          DO_added_on           DATETIME DEFAULT GETDATE(),
+          DO_modified_by        VARCHAR(100),
+          DO_modified_on        DATETIME,
+          DO_outlet_fk          VARCHAR(100),
+          CONSTRAINT CK_DO_status CHECK (DO_status IN ('pending', 'approved', 'rejected', 'completed')),
+          CONSTRAINT CK_DO_approvalStatus CHECK (DO_approvalStatus IN ('pending', 'approved', 'rejected')),
+          CONSTRAINT CK_DO_gender CHECK (DO_gender IN ('Male', 'Female', 'Other'))
+        );
+        PRINT 'DM_DietOrder table created';
+      END
+      ELSE
+      BEGIN
+        PRINT 'DM_DietOrder table already exists';
+      END
+    `;
+    await pool.request().query(query);
+    console.log("DM_DietOrder table creation query executed.");
+    await pool.close();
+  } catch (err) {
+    console.error("❌ Failed to create DM_DietOrder table:", err.message);
+  }
+}
   
 // Call test and create functions
 testConnection().then(() => {
   createDietRequestApprovalTable();
   createFoodItemTable();
+  createDietOrderTable();
 });

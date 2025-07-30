@@ -1,52 +1,71 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { 
+  getAllDietOrders, 
+  getDietOrderById, 
+  createDietOrder, 
+  updateDietOrder, 
+  deleteDietOrder 
+} from '../models/dietOrder.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dbPath = path.join(__dirname, '../db.json');
-
-function readDB() {
-  return JSON.parse(fs.readFileSync(dbPath));
-}
-function writeDB(data) {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-}
-
-export const getAll = (req, res) => {
-  const db = readDB();
-  res.json(db.dietOrders);
+// Get all diet orders
+export const getAll = async (req, res) => {
+  try {
+    const dietOrders = await getAllDietOrders();
+    res.json(dietOrders);
+  } catch (err) {
+    console.error('Error getting all diet orders:', err);
+    res.status(500).json({ error: 'Failed to get diet orders' });
+  }
 };
 
-export const getById = (req, res) => {
-  const db = readDB();
-  const item = db.dietOrders.find(o => o.id === req.params.id);
-  if (!item) return res.status(404).json({ error: 'Not found' });
-  res.json(item);
+// Get diet order by ID
+export const getById = async (req, res) => {
+  try {
+    const dietOrder = await getDietOrderById(req.params.id);
+    if (!dietOrder) {
+      return res.status(404).json({ error: 'Diet order not found' });
+    }
+    res.json(dietOrder);
+  } catch (err) {
+    console.error('Error getting diet order by ID:', err);
+    res.status(500).json({ error: 'Failed to get diet order' });
+  }
 };
 
-export const create = (req, res) => {
-  const db = readDB();
-  const newOrder = { id: Date.now().toString(), ...req.body };
-  db.dietOrders.push(newOrder);
-  writeDB(db);
-  res.status(201).json(newOrder);
+// Create new diet order
+export const create = async (req, res) => {
+  try {
+    const newDietOrder = await createDietOrder(req.body);
+    res.status(201).json(newDietOrder);
+  } catch (err) {
+    console.error('Error creating diet order:', err);
+    res.status(500).json({ error: 'Failed to create diet order' });
+  }
 };
 
-export const update = (req, res) => {
-  const db = readDB();
-  const idx = db.dietOrders.findIndex(o => o.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  db.dietOrders[idx] = { ...db.dietOrders[idx], ...req.body };
-  writeDB(db);
-  res.json(db.dietOrders[idx]);
+// Update diet order
+export const update = async (req, res) => {
+  try {
+    const updatedDietOrder = await updateDietOrder(req.params.id, req.body);
+    if (!updatedDietOrder) {
+      return res.status(404).json({ error: 'Diet order not found' });
+    }
+    res.json(updatedDietOrder);
+  } catch (err) {
+    console.error('Error updating diet order:', err);
+    res.status(500).json({ error: 'Failed to update diet order' });
+  }
 };
 
-export const deleteOrder = (req, res) => {
-  const db = readDB();
-  const idx = db.dietOrders.findIndex(o => o.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  const deleted = db.dietOrders.splice(idx, 1);
-  writeDB(db);
-  res.json(deleted[0]);
+// Delete diet order
+export const deleteOrder = async (req, res) => {
+  try {
+    const deleted = await deleteDietOrder(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Diet order not found' });
+    }
+    res.json({ message: 'Diet order deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting diet order:', err);
+    res.status(500).json({ error: 'Failed to delete diet order' });
+  }
 }; 

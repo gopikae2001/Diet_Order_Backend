@@ -12,72 +12,102 @@
  *     DietOrder:
  *       type: object
  *       properties:
- *         id:
+ *         DO_ID_PK:
+ *           type: integer
+ *           format: int64
+ *         DO_patientName:
  *           type: string
- *         patientName:
+ *         DO_patientId:
  *           type: string
- *         patientId:
+ *         DO_contactNumber:
  *           type: string
- *         contactNumber:
+ *         DO_age:
  *           type: string
- *         age:
+ *         DO_bed:
  *           type: string
- *         bed:
+ *         DO_ward:
  *           type: string
- *         ward:
+ *         DO_floor:
  *           type: string
- *         floor:
+ *         DO_doctor:
  *           type: string
- *         doctor:
+ *         DO_dietPackage:
  *           type: string
- *         dietPackage:
+ *         DO_packageRate:
+ *           type: number
+ *           format: decimal
+ *         DO_startDate:
  *           type: string
- *         packageRate:
+ *           format: date
+ *         DO_endDate:
  *           type: string
- *         startDate:
+ *           format: date
+ *         DO_doctorNotes:
  *           type: string
- *         endDate:
+ *         DO_status:
  *           type: string
- *         doctorNotes:
+ *           enum: [pending, approved, rejected, completed]
+ *         DO_approvalStatus:
  *           type: string
- *         status:
+ *           enum: [pending, approved, rejected]
+ *         DO_dieticianInstructions:
  *           type: string
- *         approvalStatus:
+ *         DO_gender:
  *           type: string
- *         dieticianInstructions:
+ *           enum: [Male, Female, Other]
+ *         DO_patientType:
  *           type: string
- *         gender:
+ *         DO_email:
  *           type: string
- *         patientType:
+ *         DO_address:
  *           type: string
- *         email:
+ *         DO_bloodGroup:
  *           type: string
- *         address:
+ *         DO_tokenNo:
  *           type: string
- *         bloodGroup:
+ *         DO_visitId:
  *           type: string
- *         tokenNo:
+ *         DO_added_by:
  *           type: string
- *         visitId:
+ *         DO_added_on:
+ *           type: string
+ *           format: date-time
+ *         DO_modified_by:
+ *           type: string
+ *         DO_modified_on:
+ *           type: string
+ *           format: date-time
+ *         DO_outlet_fk:
  *           type: string
  *       example:
- *         id: "1752050988003"
- *         patientName: "gj"
- *         patientId: "p001"
- *         contactNumber: "9888888888"
- *         age: "38 years"
- *         bed: "007"
- *         ward: "14"
- *         floor: ""
- *         dietPackage: "1751889270121"
- *         packageRate: "60"
- *         startDate: "2025-07-09"
- *         endDate: "2025-08-01"
- *         doctorNotes: ""
- *         status: "stopped"
- *         approvalStatus: "rejected"
- *         dieticianInstructions: ""
- *
+ *         DO_ID_PK: 1
+ *         DO_patientName: "John Doe"
+ *         DO_patientId: "P001"
+ *         DO_contactNumber: "9888888888"
+ *         DO_age: "38 years"
+ *         DO_bed: "007"
+ *         DO_ward: "14"
+ *         DO_floor: "2nd Floor"
+ *         DO_doctor: "Dr. Smith"
+ *         DO_dietPackage: "Standard Diet"
+ *         DO_packageRate: 60.00
+ *         DO_startDate: "2025-07-09"
+ *         DO_endDate: "2025-08-01"
+ *         DO_doctorNotes: "Patient requires low sodium diet"
+ *         DO_status: "pending"
+ *         DO_approvalStatus: "pending"
+ *         DO_dieticianInstructions: "Monitor sodium intake"
+ *         DO_gender: "Male"
+ *         DO_patientType: "Inpatient"
+ *         DO_email: "john.doe@email.com"
+ *         DO_address: "123 Main St, City"
+ *         DO_bloodGroup: "O+"
+ *         DO_tokenNo: "T001"
+ *         DO_visitId: "V001"
+ *         DO_added_by: "admin"
+ *         DO_added_on: "2025-07-29T10:00:00Z"
+ *         DO_outlet_fk: "OUTLET001"
+
  * /dietOrders:
  *   get:
  *     summary: Get all diet orders
@@ -117,7 +147,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *           format: int64
  *     responses:
  *       200:
  *         description: Diet order found
@@ -133,7 +164,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *           format: int64
  *     requestBody:
  *       required: true
  *       content:
@@ -155,7 +187,8 @@
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *           format: int64
  *     responses:
  *       200:
  *         description: Diet order deleted
