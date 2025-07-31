@@ -261,10 +261,56 @@ async function createDietOrderTable() {
     console.error("❌ Failed to create DM_DietOrder table:", err.message);
   }
 }
+
+async function createCanteenOrderTable() {
+  try {
+    const pool = await sql.connect(config);
+    console.log("Connected to:", process.env.MSSQL_DATABASE);
+    const query = `
+      IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'DM_canteenOrder')
+      BEGIN
+        CREATE TABLE DM_canteenOrder (
+          CO_id                    BIGINT IDENTITY(1,1) PRIMARY KEY,
+          CO_patient_id_fk         BIGINT,
+          CO_patient_name          VARCHAR(100),
+          CO_contact_number        BIGINT,
+          CO_day                   NVARCHAR(MAX),
+          CO_date                  NVARCHAR(MAX),
+          CO_time                  NVARCHAR(MAX),
+          CO_category              NVARCHAR(MAX),
+          CO_fooditem              NVARCHAR(MAX),
+          CO_price                 NVARCHAR(MAX),
+          CO_intake_amount         NVARCHAR(MAX),
+          CO_status                VARCHAR(50) DEFAULT 'pending',
+          CO_added_on              DATETIME DEFAULT GETDATE(),
+          CO_added_by              VARCHAR(100),
+          CO_modified_on           DATETIME,
+          CO_modified_by           VARCHAR(100),
+          CO_provider_fk           BIGINT,
+          CO_outlet_fk             VARCHAR(100),
+          CONSTRAINT CK_CO_status CHECK (CO_status IN ('pending', 'active', 'delivered')),
+          CONSTRAINT FK_CO_patient_id FOREIGN KEY (CO_patient_id_fk) REFERENCES hodo_patient_registration(patient_id),
+          CONSTRAINT FK_CO_diet_order FOREIGN KEY (CO_id) REFERENCES DM_DietOrder(DO_ID_PK)
+        );
+        PRINT 'DM_canteenOrder table created';
+      END
+      ELSE
+      BEGIN
+        PRINT 'DM_canteenOrder table already exists';
+      END
+    `;
+    await pool.request().query(query);
+    console.log("DM_canteenOrder table creation query executed.");
+    await pool.close();
+  } catch (err) {
+    console.error("❌ Failed to create DM_canteenOrder table:", err.message);
+  }
+}
   
 // Call test and create functions
 testConnection().then(() => {
   createDietRequestApprovalTable();
   createFoodItemTable();
   createDietOrderTable();
+  createCanteenOrderTable();
 });
